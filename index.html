@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
+</head>
+<body>
+    <script>
+        var list = [];
+        var colCount = 8;
+        var rowCount = 6;
+        var cellsCount = rowCount * colCount;
+        var maxBombs = 10;
+        var config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            scene: {
+                preload: preload,
+                create: create
+            }
+        };
+
+    var game = new Phaser.Game(config);
+
+    function preload ()
+    {
+        this.load.spritesheet('brick', 'public/assets/brick.png',{ frameWidth: 200, frameHeight: 200 });
+        this.load.image('bg', 'public/assets/bg.jpg');
+    }
+
+    function create ()
+    {
+        this.add.image(400, 300, 'bg');
+        for(var i = 1; i <= rowCount; i++){
+            for(var j = 1; j <= colCount; j++){
+                var l = this.add.image((100*j)-100, (i*100)-100, 'brick').setOrigin(0,0);
+                l.row = i;
+                l.col = j;
+                l.hasBomb = false;
+                l.on('pointerdown', function(){
+                    // this.setVisible(false);
+                    console.log(this.row + ", " + this.col);
+                    console.log(this.hasBomb);
+                });
+                l.setInteractive();
+                list.push(l);
+            }
+        }
+        var bombCount = 0;
+        var tries = 0;
+        while(bombCount < maxBombs && tries < 200){
+            for(var i = 0; i < list.length; i++){
+                var rand = Math.floor(Math.random()*cellsCount);
+                if(rand == 1){
+                    list[i].hasBomb = true;
+                    list[i].setTint(0xff0000);
+                    bombCount ++;
+                    if(bombCount >= maxBombs){
+                        break;
+                    }
+                }
+        }
+        tries ++;
+        }
+    }
+    </script>
+
+</body>
+</html>
