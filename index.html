@@ -40,39 +40,36 @@
             // Fill the board with bricks
             generate_bricks(this, 100, 6, 8);
 
-            //Generate bombs within bricks
-            generate_bombs(20, 100);
+            // Generate bombs within bricks
+            generate_bombs(10, 100);
+
+            this.input.mouse.disableContextMenu();
 
             list.forEach(el => {
-                el.on('pointerdown', function () {
-                    if (this.hasBomb === true) {
-                        this.setTexture('bomb');
-                        lost = true;
-                        return;
-                    }
-                    var r = this.row;
-                    var c = this.col;
-                    console.log(r + " " + c);
-                    var temp_list = [
-                        [r - 1, c - 1],
-                        [r - 1, c],
-                        [r - 1, c + 1],
-                        [r, c - 1],
-                        [r, c + 1],
-                        [r + 1, c - 1],
-                        [r + 1, c],
-                        [r + 1, c + 1]
-                    ];
-                    var bombs = 0;
-                    temp_list.forEach(function (el) {
-                        if (temp_obj = Phaser.Actions.GetFirst(list, { row: el[0], col: el[1] })) {
-                            if (temp_obj.hasBomb == true) {
-                                bombs++;
-                            }
+                // Set the bomb count for every block
+                set_bomb_count(el);
+                el.on('pointerdown', function (pointer) {
+                    if (pointer.rightButtonDown()) {
+                        if (!this.isTinted && !this.isRevealed) {
+                            this.setTint('0xaa0000');
+                            this.isTinted = true;
                         }
-                    });
-                    this.setTexture('brick' + bombs);
-                    score += bombs;
+                        else {
+                            this.clearTint();
+                            this.isTinted = true;
+                        }
+                    }
+                    else {
+                        this.isRevealed = true;
+                        this.clearTint();
+                        if (this.hasBomb === true) {
+                            this.setTexture('bomb');
+                            lost = true;
+                            return;
+                        }
+                        detect_bombs(el);
+
+                    }
 
                 });
             });
@@ -82,7 +79,8 @@
         function update() {
             if (lost) {
                 list.forEach(el => {
-                    if(el.hasBomb){
+                    if (el.hasBomb) {
+                        el.clearTint();
                         el.setTexture('bomb');
                     }
                     el.off('pointerdown');
@@ -98,6 +96,8 @@
                     l.row = i;
                     l.col = j;
                     l.hasBomb = false;
+                    l.isTinted = false;
+                    l.isRevealed = false;
                     l.setInteractive();
                     list.push(l);
                 }
@@ -121,6 +121,52 @@
                 }
                 max_loops++;
             }
+        }
+
+        function set_bomb_count(block) {
+            var r = block.row;
+            var c = block.col;
+            console.log(r + " " + c);
+            var temp_list = surrounding_blocks(r, c);
+            var bombs = 0;
+            temp_list.forEach(function (el) {
+                if (temp_obj = Phaser.Actions.GetFirst(list, { row: el[0], col: el[1] })) {
+                    if (temp_obj.hasBomb == true) {
+                        bombs++;
+                    }
+                }
+            });
+            block.bombCount = bombs;
+        }
+
+        function detect_bombs(block) {
+            var r = block.row;
+            var c = block.col;
+            var temp_list = surrounding_blocks(r, c);
+            block.setTexture('brick' + block.bombCount);
+            score += block.bombCount;
+            if (block.bombCount == 0) {
+                temp_list.forEach(function (el) {
+                    if (temp_obj = Phaser.Actions.GetFirst(list, { row: el[0], col: el[1], bombCount: 0 })) {
+                        temp_obj.setTexture('brick0');
+                        temp_obj.isRevealed = true;
+                        temp_obj.clearTint();
+                    }
+                });
+            }
+        }
+
+        function surrounding_blocks(r, c) {
+            return [
+                [r - 1, c - 1],
+                [r - 1, c],
+                [r - 1, c + 1],
+                [r, c - 1],
+                [r, c + 1],
+                [r + 1, c - 1],
+                [r + 1, c],
+                [r + 1, c + 1]
+            ];
         }
     </script>
 
