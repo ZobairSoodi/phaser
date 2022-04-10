@@ -11,82 +11,115 @@
         var cellsCount;
         var score = 0;
         var lost = false;
+
+        var mainGameScene = new Phaser.Class({
+            Extends: Phaser.Scene,
+            initialize:
+                function mainGameScene() {
+                    Phaser.Scene.call(this, { 'key': 'mainGameScene' })
+                },
+            preload: function () {
+                list = [];
+                cellsCount;
+                score = 0;
+                lost = false;
+                
+                for (var i = 0; i < 9; i++) {
+                    this.load.image('brick' + i, 'public/assets/brick' + i + '.png');
+                }
+            },
+            create: function () {
+                this.add.image(400, 300, 'bg');
+
+                // Fill the board with bricks
+                generate_bricks(this, 100, 6, 8);
+
+                // Generate bombs within bricks
+                generate_bombs(10, 100);
+
+                this.input.mouse.disableContextMenu();
+
+                list.forEach(el => {
+                    // Set the bomb count for every block
+                    set_bomb_count(el);
+                    el.on('pointerdown', function (pointer) {
+                        if (pointer.rightButtonDown()) {
+                            if (!this.isTinted && !this.isRevealed) {
+                                this.setTint('0x00aaaa');
+                                this.isTinted = true;
+                            }
+                            else {
+                                this.clearTint();
+                                this.isTinted = true;
+                            }
+                        }
+                        else {
+                            this.isRevealed = true;
+                            this.clearTint();
+                            if (this.hasBomb === true) {
+                                this.setTexture('bomb');
+                                lost = true;
+                                return;
+                            }
+                            detect_bombs(el);
+
+                        }
+
+                    });
+                });
+
+            },
+            update: function () {
+                if (lost) {
+                    list.forEach(el => {
+                        if (el.hasBomb) {
+                            el.clearTint();
+                            el.setTexture('bomb');
+                        }
+                        el.off('pointerdown');
+                    });
+                    lost = false;
+                    var try_again = this.add.image(400, 300, 'try_again');
+                    try_again.setInteractive();
+                    try_again.on('pointerdown', function () {
+                        this.scene.restart()
+                    }, this)
+                }
+            }
+        });
+        var mainMenuScene = new Phaser.Class({
+            Extends: Phaser.Scene,
+            initialize:
+                function () {
+                    Phaser.Scene.call(this, { 'key': 'mainMenuScene' });
+                },
+            preload: function () {
+                this.load.image('start_game', 'public/assets/start_game.png');
+                this.load.spritesheet('brick', 'public/assets/brick.png', { frameWidth: 200, frameHeight: 200 });
+                this.load.image('bg', 'public/assets/bg.jpg');
+                this.load.image('bomb', 'public/assets/bomb.png');
+                this.load.image('try_again', 'public/assets/try_again.png');
+            },
+            create: function () {
+                this.add.image(400, 300, 'bg');
+                var start_button = this.add.image(400, 300, 'start_game');
+                start_button.setInteractive();
+                start_button.on('pointerdown', function(){
+                    this.scene.start('mainGameScene');
+                },this)
+            },
+            update: function () { }
+        })
+
         var config = {
             type: Phaser.AUTO,
             width: 800,
             height: 600,
-            scene: {
-                preload: preload,
-                create: create,
-                update: update
-            }
+            scene: [mainMenuScene, mainGameScene]
         };
 
         var game = new Phaser.Game(config);
 
-        function preload() {
-            this.load.spritesheet('brick', 'public/assets/brick.png', { frameWidth: 200, frameHeight: 200 });
-            this.load.image('bg', 'public/assets/bg.jpg');
-            this.load.image('bomb', 'public/assets/bomb.png');
-            for (var i = 0; i < 9; i++) {
-                this.load.image('brick' + i, 'public/assets/brick' + i + '.png');
-            }
-
-        }
-
-        function create() {
-            this.add.image(400, 300, 'bg');
-
-            // Fill the board with bricks
-            generate_bricks(this, 100, 6, 8);
-
-            // Generate bombs within bricks
-            generate_bombs(10, 100);
-
-            this.input.mouse.disableContextMenu();
-
-            list.forEach(el => {
-                // Set the bomb count for every block
-                set_bomb_count(el);
-                el.on('pointerdown', function (pointer) {
-                    if (pointer.rightButtonDown()) {
-                        if (!this.isTinted && !this.isRevealed) {
-                            this.setTint('0xaa0000');
-                            this.isTinted = true;
-                        }
-                        else {
-                            this.clearTint();
-                            this.isTinted = true;
-                        }
-                    }
-                    else {
-                        this.isRevealed = true;
-                        this.clearTint();
-                        if (this.hasBomb === true) {
-                            this.setTexture('bomb');
-                            lost = true;
-                            return;
-                        }
-                        detect_bombs(el);
-
-                    }
-
-                });
-            });
-
-        }
-
-        function update() {
-            if (lost) {
-                list.forEach(el => {
-                    if (el.hasBomb) {
-                        el.clearTint();
-                        el.setTexture('bomb');
-                    }
-                    el.off('pointerdown');
-                });
-            }
-        }
 
         function generate_bricks(brick, n, rows, cols) {
             cellsCount = rows * cols;
@@ -126,7 +159,6 @@
         function set_bomb_count(block) {
             var r = block.row;
             var c = block.col;
-            console.log(r + " " + c);
             var temp_list = surrounding_blocks(r, c);
             var bombs = 0;
             temp_list.forEach(function (el) {
