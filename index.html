@@ -45,7 +45,7 @@
                     el.on('pointerdown', function (pointer) {
                         if (pointer.rightButtonDown()) {
                             if (!this.isTinted && !this.isRevealed) {
-                                this.setTint('0x00aaaa');
+                                this.setTint('0x7777');
                                 this.isTinted = true;
                             }
                             else {
@@ -70,6 +70,7 @@
 
             },
             update: function () {
+                // Lose
                 if (lost) {
                     list.forEach(el => {
                         if (el.hasBomb) {
@@ -85,6 +86,7 @@
                         this.scene.restart()
                     }, this)
                 }
+                
             }
         });
         var mainMenuScene = new Phaser.Class({
