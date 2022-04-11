@@ -11,6 +11,7 @@
         var cellsCount;
         var score = 0;
         var lost = false;
+        var total_bombs = 0;
 
         var mainGameScene = new Phaser.Class({
             Extends: Phaser.Scene,
@@ -86,7 +87,8 @@
                         this.scene.restart()
                     }, this)
                 }
-                
+                // Win
+
             }
         });
         var mainMenuScene = new Phaser.Class({
@@ -145,7 +147,7 @@
             while (bombCount < maxBombs && max_loops < tries) {
                 for (var i = 0; i < list.length; i++) {
                     var rand = Math.floor(Math.random() * cellsCount);
-                    if (rand == 1) {
+                    if (rand == 1 && list[i].hasBomb == false) {
                         list[i].hasBomb = true;
                         // list[i].setTint(0xff0000);
                         bombCount++;
@@ -156,6 +158,7 @@
                 }
                 max_loops++;
             }
+            total_bombs = bombCount;
         }
 
         function set_bomb_count(block) {
