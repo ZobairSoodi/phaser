@@ -12,6 +12,9 @@
         var score = 0;
         var lost = false;
         var total_bombs = 0;
+        var rows = 6;
+        var cols = 8;
+        var reveal_count = 0;
 
         var mainGameScene = new Phaser.Class({
             Extends: Phaser.Scene,
@@ -24,19 +27,22 @@
                 cellsCount;
                 score = 0;
                 lost = false;
-                
+                reveal_count = 0;
+
                 for (var i = 0; i < 9; i++) {
                     this.load.image('brick' + i, 'public/assets/brick' + i + '.png');
                 }
+                this.load.image('back_to_main', 'public/assets/main_menu.png');
+                this.load.image('won', 'public/assets/won.png');
             },
             create: function () {
                 this.add.image(400, 300, 'bg');
 
                 // Fill the board with bricks
-                generate_bricks(this, 100, 6, 8);
+                generate_bricks(this, 100, rows, cols);
 
                 // Generate bombs within bricks
-                generate_bombs(10, 100);
+                generate_bombs(1, 100);
 
                 this.input.mouse.disableContextMenu();
 
@@ -55,7 +61,10 @@
                             }
                         }
                         else {
-                            this.isRevealed = true;
+                            if (!this.isRevealed) {
+                                this.isRevealed = true;
+                                reveal_count++;
+                            }
                             this.clearTint();
                             if (this.hasBomb === true) {
                                 this.setTexture('bomb');
@@ -73,13 +82,7 @@
             update: function () {
                 // Lose
                 if (lost) {
-                    list.forEach(el => {
-                        if (el.hasBomb) {
-                            el.clearTint();
-                            el.setTexture('bomb');
-                        }
-                        el.off('pointerdown');
-                    });
+                    reveal_bombs();
                     lost = false;
                     var try_again = this.add.image(400, 300, 'try_again');
                     try_again.setInteractive();
@@ -88,9 +91,24 @@
                     }, this)
                 }
                 // Win
-
+                else if (reveal_count == (rows * cols) - total_bombs) {
+                    console.log("won");
+                    var back_to_main = this.add.image(400, 300, 'back_to_main');
+                    back_to_main.setInteractive();
+                    back_to_main.on('pointerdown', function(){
+                        this.scene.start('mainMenuScene');
+                    },this)
+                    this.add.image(400, 150, 'won');
+                    reveal_bombs();
+                    reveal_count = 0;
+                }
             }
         });
+
+
+
+        // Menu Scene
+
         var mainMenuScene = new Phaser.Class({
             Extends: Phaser.Scene,
             initialize:
@@ -108,9 +126,9 @@
                 this.add.image(400, 300, 'bg');
                 var start_button = this.add.image(400, 300, 'start_game');
                 start_button.setInteractive();
-                start_button.on('pointerdown', function(){
+                start_button.on('pointerdown', function () {
                     this.scene.start('mainGameScene');
-                },this)
+                }, this)
             },
             update: function () { }
         })
@@ -186,7 +204,11 @@
                 temp_list.forEach(function (el) {
                     if (temp_obj = Phaser.Actions.GetFirst(list, { row: el[0], col: el[1], bombCount: 0 })) {
                         temp_obj.setTexture('brick0');
-                        temp_obj.isRevealed = true;
+                        if (!temp_obj.isRevealed) {
+                            reveal_count++;
+                            temp_obj.isRevealed = true;
+                        }
+
                         temp_obj.clearTint();
                     }
                 });
@@ -204,6 +226,16 @@
                 [r + 1, c],
                 [r + 1, c + 1]
             ];
+        }
+
+        function reveal_bombs() {
+            list.forEach(el => {
+                if (el.hasBomb) {
+                    el.clearTint();
+                    el.setTexture('bomb');
+                }
+                el.off('pointerdown');
+            });
         }
     </script>
 
