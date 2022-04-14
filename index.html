@@ -32,11 +32,29 @@
                 for (var i = 0; i < 9; i++) {
                     this.load.image('brick' + i, 'public/assets/brick' + i + '.svg');
                 }
+                this.load.image('flag', 'public/assets/flag.svg');
+                this.load.image('head', 'public/assets/head.png');
+                this.load.image('reset', 'public/assets/reset_btn.png');
+                this.load.image('reset_clicked', 'public/assets/reset_clicked.png');
                 this.load.image('back_to_main', 'public/assets/main_menu.png');
                 this.load.image('won', 'public/assets/won.png');
             },
             create: function () {
                 this.add.image(400, 300, 'bg');
+                this.add.image(0,0, 'head').setOrigin(0,0);
+
+                // Add reset button and its functionalities
+                var reset_btn = this.add.image(300,50, 'reset');
+                reset_btn.setInteractive();
+                reset_btn.on('pointerdown',function(){
+                    this.setTexture('reset_clicked');
+                })
+                reset_btn.on('pointerup',function(){
+                    this.setTexture('reset');
+                })
+                reset_btn.on('pointerout',function(){
+                    this.setTexture('reset');
+                })
 
                 // Fill the board with bricks
                 generate_bricks(this, 50, rows, cols);
@@ -44,6 +62,7 @@
                 // Generate bombs within bricks
                 generate_bombs(10, 100);
 
+                // Disable the default behavior of right-click
                 this.input.mouse.disableContextMenu();
 
                 list.forEach(el => {
@@ -51,13 +70,13 @@
                     set_bomb_count(el);
                     el.on('pointerdown', function (pointer) {
                         if (pointer.rightButtonDown()) {
-                            if (!this.isTinted && !this.isRevealed) {
-                                this.setTint('0x7777');
-                                this.isTinted = true;
+                            if (!this.isFlagged && !this.isRevealed) {
+                                this.setTexture('flag')
+                                this.isFlagged = true;
                             }
-                            else {
-                                this.clearTint();
-                                this.isTinted = true;
+                            else if(this.isFlagged && !this.isRevealed){
+                                this.setTexture('brick');
+                                this.isFlagged = false;
                             }
                         }
                         else {
@@ -65,7 +84,6 @@
                                 this.isRevealed = true;
                                 reveal_count++;
                             }
-                            this.clearTint();
                             if (this.hasBomb === true) {
                                 this.setTexture('bomb');
                                 lost = true;
@@ -151,7 +169,7 @@
                     l.row = i;
                     l.col = j;
                     l.hasBomb = false;
-                    l.isTinted = false;
+                    l.isFlagged = false;
                     l.isRevealed = false;
                     l.setInteractive();
                     list.push(l);
