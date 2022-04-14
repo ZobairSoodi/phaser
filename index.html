@@ -42,7 +42,7 @@
                 generate_bricks(this, 50, rows, cols);
 
                 // Generate bombs within bricks
-                generate_bombs(20, 100);
+                generate_bombs(30, 100);
 
                 this.input.mouse.disableContextMenu();
 
@@ -119,7 +119,7 @@
                 this.load.image('start_game', 'public/assets/start_game.png');
                 this.load.spritesheet('brick', 'public/assets/brick.svg', { frameWidth: 200, frameHeight: 200 });
                 this.load.image('bg', 'public/assets/bg.jpg');
-                this.load.image('bomb', 'public/assets/bomb.png');
+                this.load.image('bomb', 'public/assets/bug.png');
                 this.load.image('try_again', 'public/assets/try_again.png');
             },
             create: function () {
