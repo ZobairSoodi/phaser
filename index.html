@@ -12,8 +12,8 @@
         var score = 0;
         var lost = false;
         var total_bombs = 0;
-        var rows = 6;
-        var cols = 8;
+        var rows = 12;
+        var cols = 12;
         var reveal_count = 0;
 
         var mainGameScene = new Phaser.Class({
@@ -30,7 +30,7 @@
                 reveal_count = 0;
 
                 for (var i = 0; i < 9; i++) {
-                    this.load.image('brick' + i, 'public/assets/brick' + i + '.png');
+                    this.load.image('brick' + i, 'public/assets/brick' + i + '.svg');
                 }
                 this.load.image('back_to_main', 'public/assets/main_menu.png');
                 this.load.image('won', 'public/assets/won.png');
@@ -39,10 +39,10 @@
                 this.add.image(400, 300, 'bg');
 
                 // Fill the board with bricks
-                generate_bricks(this, 100, rows, cols);
+                generate_bricks(this, 50, rows, cols);
 
                 // Generate bombs within bricks
-                generate_bombs(10, 100);
+                generate_bombs(20, 100);
 
                 this.input.mouse.disableContextMenu();
 
@@ -84,7 +84,7 @@
                 if (lost) {
                     reveal_bombs();
                     lost = false;
-                    var try_again = this.add.image(400, 300, 'try_again');
+                    var try_again = this.add.image(300, 350, 'try_again');
                     try_again.setInteractive();
                     try_again.on('pointerdown', function () {
                         this.scene.restart()
@@ -93,12 +93,12 @@
                 // Win
                 else if (reveal_count == (rows * cols) - total_bombs) {
                     console.log("won");
-                    var back_to_main = this.add.image(400, 300, 'back_to_main');
+                    var back_to_main = this.add.image(300, 350, 'back_to_main');
                     back_to_main.setInteractive();
                     back_to_main.on('pointerdown', function(){
                         this.scene.start('mainMenuScene');
                     },this)
-                    this.add.image(400, 150, 'won');
+                    this.add.image(300, 200, 'won');
                     reveal_bombs();
                     reveal_count = 0;
                 }
@@ -117,14 +117,14 @@
                 },
             preload: function () {
                 this.load.image('start_game', 'public/assets/start_game.png');
-                this.load.spritesheet('brick', 'public/assets/brick.png', { frameWidth: 200, frameHeight: 200 });
+                this.load.spritesheet('brick', 'public/assets/brick.svg', { frameWidth: 200, frameHeight: 200 });
                 this.load.image('bg', 'public/assets/bg.jpg');
                 this.load.image('bomb', 'public/assets/bomb.png');
                 this.load.image('try_again', 'public/assets/try_again.png');
             },
             create: function () {
-                this.add.image(400, 300, 'bg');
-                var start_button = this.add.image(400, 300, 'start_game');
+                this.add.image(300, 350, 'bg');
+                var start_button = this.add.image(300, 350, 'start_game');
                 start_button.setInteractive();
                 start_button.on('pointerdown', function () {
                     this.scene.start('mainGameScene');
@@ -135,8 +135,8 @@
 
         var config = {
             type: Phaser.AUTO,
-            width: 800,
-            height: 600,
+            width: 600,
+            height: 700,
             scene: [mainMenuScene, mainGameScene]
         };
 
@@ -147,7 +147,7 @@
             cellsCount = rows * cols;
             for (var i = 1; i <= rows; i++) {
                 for (var j = 1; j <= cols; j++) {
-                    var l = brick.add.image((n * j) - n, (i * n) - n, 'brick').setOrigin(0, 0);
+                    var l = brick.add.image((n * (j)) - n, ((i+2) * n) - n, 'brick').setOrigin(0, 0);
                     l.row = i;
                     l.col = j;
                     l.hasBomb = false;
