@@ -2,6 +2,14 @@
 <html>
 
 <head>
+    <link rel="preload" as="advpix" href="public/fonts/advanced-pixel-lcd-7-font/AdvancedPixelLcd7-yGOq.ttf"
+        type="font/ttf" />
+    <style>
+        @font-face {
+            font-family: advpix;
+            src: url('public/fonts/advanced-pixel-lcd-7-font/AdvancedPixelLcd7-yGOq.ttf');
+        }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
 </head>
 
@@ -9,12 +17,15 @@
     <script>
         var list = [];
         var cellsCount;
-        var score = 0;
         var lost = false;
         var total_bombs = 0;
         var rows = 12;
         var cols = 12;
         var reveal_count = 0;
+        var score_text;
+        var score = '000'
+        var timer_text;
+        var timer = '000'
 
         var mainGameScene = new Phaser.Class({
             Extends: Phaser.Scene,
@@ -25,7 +36,7 @@
             preload: function () {
                 list = [];
                 cellsCount;
-                score = 0;
+                score = '000'; 
                 lost = false;
                 reveal_count = 0;
 
@@ -41,20 +52,25 @@
             },
             create: function () {
                 this.add.image(400, 300, 'bg');
-                this.add.image(0,0, 'head').setOrigin(0,0);
+                this.add.image(0, 0, 'head').setOrigin(0, 0);
 
                 // Add reset button and its functionalities
-                var reset_btn = this.add.image(300,50, 'reset');
+                var reset_btn = this.add.image(300, 50, 'reset');
                 reset_btn.setInteractive();
-                reset_btn.on('pointerdown',function(){
+                reset_btn.on('pointerdown', function () {
                     this.setTexture('reset_clicked');
                 })
-                reset_btn.on('pointerup',function(){
+                reset_btn.on('pointerup', function () {
                     this.setTexture('reset');
                 })
-                reset_btn.on('pointerout',function(){
+                reset_btn.on('pointerout', function () {
                     this.setTexture('reset');
                 })
+
+                // Add score and timer
+                score_text = this.add.text(114, 38, score, { fontFamily: 'advpix', color:'red' });
+                timer_text = this.add.text(432, 38, timer, { fontFamily: 'advpix', color:'red' });
+
 
                 // Fill the board with bricks
                 generate_bricks(this, 50, rows, cols);
@@ -74,7 +90,7 @@
                                 this.setTexture('flag')
                                 this.isFlagged = true;
                             }
-                            else if(this.isFlagged && !this.isRevealed){
+                            else if (this.isFlagged && !this.isRevealed) {
                                 this.setTexture('brick');
                                 this.isFlagged = false;
                             }
@@ -113,9 +129,9 @@
                     console.log("won");
                     var back_to_main = this.add.image(300, 350, 'back_to_main');
                     back_to_main.setInteractive();
-                    back_to_main.on('pointerdown', function(){
+                    back_to_main.on('pointerdown', function () {
                         this.scene.start('mainMenuScene');
-                    },this)
+                    }, this)
                     this.add.image(300, 200, 'won');
                     reveal_bombs();
                     reveal_count = 0;
@@ -165,7 +181,7 @@
             cellsCount = rows * cols;
             for (var i = 1; i <= rows; i++) {
                 for (var j = 1; j <= cols; j++) {
-                    var l = brick.add.image((n * (j)) - n, ((i+2) * n) - n, 'brick').setOrigin(0, 0);
+                    var l = brick.add.image((n * (j)) - n, ((i + 2) * n) - n, 'brick').setOrigin(0, 0);
                     l.row = i;
                     l.col = j;
                     l.hasBomb = false;
