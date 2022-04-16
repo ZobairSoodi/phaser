@@ -23,9 +23,10 @@
         var cols = 12;
         var reveal_count = 0;
         var score_text;
-        var score = '000'
+        var score = 0;
         var timer_text;
-        var timer = '000'
+        var timer = 0;
+        var timerEvent;
 
         var mainGameScene = new Phaser.Class({
             Extends: Phaser.Scene,
@@ -36,7 +37,7 @@
             preload: function () {
                 list = [];
                 cellsCount;
-                score = '000'; 
+                score = 0;
                 lost = false;
                 reveal_count = 0;
 
@@ -68,8 +69,12 @@
                 })
 
                 // Add score and timer
-                score_text = this.add.text(114, 38, score, { fontFamily: 'advpix', color:'red' });
-                timer_text = this.add.text(432, 38, timer, { fontFamily: 'advpix', color:'red' });
+                score_text = this.add.text(114, 38, score, { fontFamily: 'advpix', color: 'red' });
+                timer_text = this.add.text(432, 38, '000', { fontFamily: 'advpix', color: 'red' });
+
+                // update timer
+                timerEvent = this.time.addEvent({ delay: 1000, callback: updateTimer, callbackScope: this, loop: true });
+
 
 
                 // Fill the board with bricks
@@ -106,14 +111,17 @@
                                 return;
                             }
                             detect_bombs(el);
-
+                            score_text.setText(score);
                         }
 
                     });
                 });
 
+                
             },
             update: function () {
+
+
                 // Lose
                 if (lost) {
                     reveal_bombs();
@@ -138,8 +146,6 @@
                 }
             }
         });
-
-
 
         // Menu Scene
 
@@ -270,6 +276,19 @@
                 }
                 el.off('pointerdown');
             });
+        }
+
+        function updateTimer() {
+            timer++;
+            if (timer < 10) {
+                timer_text.setText('00' + timer);
+            }
+            else if (timer < 100) {
+                timer_text.setText('0' + timer);
+            }
+            else{
+                timer_text.setText(timer);
+            }
         }
     </script>
 
