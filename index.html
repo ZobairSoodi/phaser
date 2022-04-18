@@ -69,11 +69,11 @@
                 })
 
                 // Add score and timer
-                score_text = this.add.text(114, 38, score, { fontFamily: 'advpix', color: 'red' });
+                score_text = this.add.text(114, 38, '000', { fontFamily: 'advpix', color: 'red' });
                 timer_text = this.add.text(432, 38, '000', { fontFamily: 'advpix', color: 'red' });
 
                 // update timer
-                timerEvent = this.time.addEvent({ delay: 1000, callback: updateTimer, callbackScope: this, loop: true });
+                timerEvent = this.time.addEvent({ delay: 1000, callback: updateTimer, callbackScope: this,paused: true, loop: true });
 
 
 
@@ -81,7 +81,7 @@
                 generate_bricks(this, 50, rows, cols);
 
                 // Generate bombs within bricks
-                generate_bombs(10, 100);
+                generate_bombs(30, 100);
 
                 // Disable the default behavior of right-click
                 this.input.mouse.disableContextMenu();
@@ -90,6 +90,9 @@
                     // Set the bomb count for every block
                     set_bomb_count(el);
                     el.on('pointerdown', function (pointer) {
+                        if(timerEvent.paused){
+                            timerEvent.paused = false;
+                        }
                         if (pointer.rightButtonDown()) {
                             if (!this.isFlagged && !this.isRevealed) {
                                 this.setTexture('flag')
@@ -111,7 +114,15 @@
                                 return;
                             }
                             detect_bombs(el);
-                            score_text.setText(score);
+                            if(score < 10){
+                                score_text.setText('00' + score);
+                            }
+                            else if(score < 100){
+                                score_text.setText('0' + score);
+                            }
+                            else{
+                                score_text.setText(score);
+                            }
                         }
 
                     });
