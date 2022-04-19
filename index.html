@@ -81,7 +81,7 @@
                 generate_bricks(this, 50, rows, cols);
 
                 // Generate bombs within bricks
-                generate_bombs(30, 100);
+                generate_bombs(15, 100);
 
                 // Disable the default behavior of right-click
                 this.input.mouse.disableContextMenu();
@@ -250,7 +250,9 @@
             var c = block.col;
             var temp_list = surrounding_blocks(r, c);
             block.setTexture('brick' + block.bombCount);
-            score += block.bombCount;
+            if(block.isRevealed){
+                score += block.bombCount;
+            }
             if (block.bombCount == 0) {
                 temp_list.forEach(function (el) {
                     if (temp_obj = Phaser.Actions.GetFirst(list, { row: el[0], col: el[1], bombCount: 0 })) {
