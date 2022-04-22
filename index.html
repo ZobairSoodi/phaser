@@ -40,6 +40,7 @@
                 score = 0;
                 lost = false;
                 reveal_count = 0;
+                timer = 0
 
                 for (var i = 0; i < 9; i++) {
                     this.load.image('brick' + i, 'public/assets/brick' + i + '.svg');
@@ -62,8 +63,9 @@
                     this.setTexture('reset_clicked');
                 })
                 reset_btn.on('pointerup', function () {
-                    this.setTexture('reset');
-                })
+                    reset_btn.setTexture('reset');
+                    this.scene.restart();
+                }, this)
                 reset_btn.on('pointerout', function () {
                     this.setTexture('reset');
                 })
@@ -81,7 +83,7 @@
                 generate_bricks(this, 50, rows, cols);
 
                 // Generate bombs within bricks
-                generate_bombs(15, 100);
+                generate_bombs(30, 100);
 
                 // Disable the default behavior of right-click
                 this.input.mouse.disableContextMenu();
@@ -295,12 +297,15 @@
             timer++;
             if (timer < 10) {
                 timer_text.setText('00' + timer);
+                timer_text.setPosition(432, 38)
             }
             else if (timer < 100) {
                 timer_text.setText('0' + timer);
+                timer_text.setPosition(432, 38)
             }
-            else{
+            else if(timer > 999){
                 timer_text.setText(timer);
+                timer_text.setPosition(420, 38)
             }
         }
     </script>
