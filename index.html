@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
 </head>
 
-<body>
+<body style="display: flex; justify-content: center;">
     <script>
         var list = [];
         var cellsCount;
@@ -75,7 +75,7 @@
                 timer_text = this.add.text(432, 38, '000', { fontFamily: 'advpix', color: 'red' });
 
                 // update timer
-                timerEvent = this.time.addEvent({ delay: 1000, callback: updateTimer, callbackScope: this,paused: true, loop: true });
+                timerEvent = this.time.addEvent({ delay: 1000, callback: updateTimer, callbackScope: this, paused: true, loop: true });
 
 
 
@@ -92,7 +92,7 @@
                     // Set the bomb count for every block
                     set_bomb_count(el);
                     el.on('pointerdown', function (pointer) {
-                        if(timerEvent.paused){
+                        if (timerEvent.paused) {
                             timerEvent.paused = false;
                         }
                         if (pointer.rightButtonDown()) {
@@ -116,13 +116,13 @@
                                 return;
                             }
                             detect_bombs(el);
-                            if(score < 10){
+                            if (score < 10) {
                                 score_text.setText('00' + score);
                             }
-                            else if(score < 100){
+                            else if (score < 100) {
                                 score_text.setText('0' + score);
                             }
-                            else{
+                            else {
                                 score_text.setText(score);
                             }
                         }
@@ -130,7 +130,7 @@
                     });
                 });
 
-                
+
             },
             update: function () {
 
@@ -252,7 +252,7 @@
             var c = block.col;
             var temp_list = surrounding_blocks(r, c);
             block.setTexture('brick' + block.bombCount);
-            if(block.isRevealed){
+            if (block.isRevealed) {
                 score += block.bombCount;
             }
             if (block.bombCount == 0) {
@@ -303,7 +303,7 @@
                 timer_text.setText('0' + timer);
                 timer_text.setPosition(432, 38)
             }
-            else if(timer > 999){
+            else if (timer > 999) {
                 timer_text.setText(timer);
                 timer_text.setPosition(420, 38)
             }
