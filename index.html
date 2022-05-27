@@ -303,6 +303,10 @@
                 timer_text.setText('0' + timer);
                 timer_text.setPosition(432, 38)
             }
+            else if (timer < 999) {
+                timer_text.setText(timer);
+                timer_text.setPosition(432, 38)
+            }
             else if (timer > 999) {
                 timer_text.setText(timer);
                 timer_text.setPosition(420, 38)
